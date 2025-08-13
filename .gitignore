@@ -1,0 +1,15 @@
+# Python cache files
+__pycache__/
+
+# Poetry virtual environment folder
+.venv/
+
+# Ignore image and plot files
+*.png
+*.jpg
+*.svg
+
+# Or if you want to be more specific with the graph names
+character_sentiment_comparison.png
+movie_sentiment_over_time.png
+*_word_cloud.png

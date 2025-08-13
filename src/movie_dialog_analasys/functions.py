@@ -16,13 +16,12 @@ def clean_and_parse_script(raw_script_text):
     # Initialize a list to hold structured dialogue data
     dialogue_data_list = []
     
-    skip_characters = {'reprise', 'response', 'voices', 'solo'}
+    skip_characters = {'reprise', 'response', 'voices', 'solo', 'both'}
     for line in lines:
         # Use regex to find character names and their dialogues
         match = re.match(r'(\w+):\s*(.*)', line)
         if match:
             character, dialogue = match.groups()
-            # Skip if character is in the skip list (case-insensitive)
             if character.lower() in skip_characters:
                 continue
             dialogue_data_list.append({'character': character, 'dialogue': dialogue})
@@ -42,7 +41,7 @@ def generate_sentiment_over_time_plot(dataframe):
 
     dataframe['line_number'] = range(len(dataframe))
 
-    sns.lineplot(x='line_number', y='sentiment_score', data=dataframe, alpha=0.7)
+    sns.lineplot(x='line_number', y='sentiment', data=dataframe, alpha=0.7)
 
     plt.title(f"Sentiment Over Time", fontsize=16)
     plt.xlabel("Line Number in Script", fontsize=12)
@@ -55,7 +54,7 @@ def generate_sentiment_over_time_plot(dataframe):
 def generate_character_sentiment_bar_chart(dataframe):
     # Calculate the average sentiment score for each character
     # Note: Ensure the column name is 'sentiment_score' from your analysis step
-    character_sentiment = dataframe.groupby('character')['sentiment_score'].mean()
+    character_sentiment = dataframe.groupby('character')['sentiment'].mean()
     character_sentiment = character_sentiment.sort_values(ascending=False)
   
     top_characters = character_sentiment.head(3)
@@ -64,7 +63,7 @@ def generate_character_sentiment_bar_chart(dataframe):
 
     plt.figure(figsize=(10, 6))
     
-    sns.barplot(x=selected_characters.index, y=selected_characters.values, palette='coolwarm')
+    sns.barplot(x=selected_characters.index, y=selected_characters.values, palette='coolwarm', hue=selected_characters.index, legend=False)
     
     plt.title("Top & Bottom 3 Character Sentiment Comparison", fontsize=16)
     plt.xlabel("Character", fontsize=12)
