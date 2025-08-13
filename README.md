@@ -28,8 +28,9 @@ poetry install
 # 3. Add a script file named script.txt to the project root
 # 4. Run analysis
 poetry run python src/main.py
+```bash
 
 Outputs (.png files) will appear in the project directory.
 
-##📊 Example Results
+## 📊 Example Results
 see example_result.pdf for an analasys of "Sounds of Music"
