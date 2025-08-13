@@ -18,7 +18,6 @@ def clean_and_parse_script(raw_script_text):
     
     skip_characters = {'reprise', 'response', 'voices', 'solo', 'both'}
     for line in lines:
-        # Use regex to find character names and their dialogues
         match = re.match(r'(\w+):\s*(.*)', line)
         if match:
             character, dialogue = match.groups()
@@ -28,15 +27,18 @@ def clean_and_parse_script(raw_script_text):
     return pd.DataFrame(dialogue_data_list)
 
 def get_sentiment(text):
+    """Calculate sentiment polarity of the text using TextBlob."""
     if not isinstance(text, str):
         return None # Handle non-string values
     return TextBlob(text).sentiment.polarity
 
 def analyze_sentiment(dialogue_data):
+    """Analyze sentiment of the dialogue data."""
     dialogue_data['sentiment'] = dialogue_data['dialogue'].apply(get_sentiment)
     return dialogue_data
 
 def generate_sentiment_over_time_plot(dataframe):
+    """Generate a line plot showing sentiment over time."""
     plt.figure(figsize=(14, 7))
 
     dataframe['line_number'] = range(len(dataframe))
@@ -52,8 +54,8 @@ def generate_sentiment_over_time_plot(dataframe):
     plt.show()
 
 def generate_character_sentiment_bar_chart(dataframe):
+    """Generate a bar chart comparing sentiment of top and bottom characters."""
     # Calculate the average sentiment score for each character
-    # Note: Ensure the column name is 'sentiment_score' from your analysis step
     character_sentiment = dataframe.groupby('character')['sentiment'].mean()
     character_sentiment = character_sentiment.sort_values(ascending=False)
   
@@ -78,6 +80,7 @@ def generate_character_sentiment_bar_chart(dataframe):
         generate_word_cloud(dataframe, character_name)
 
 def generate_word_cloud(dataframe, character_name):
+    """Generate a word cloud for the specified character."""
     character_df = dataframe[dataframe['character'] == character_name.upper()]
     
     text = " ".join(character_df['dialogue'].tolist()) 
@@ -98,6 +101,7 @@ def generate_word_cloud(dataframe, character_name):
 
 
 def generate_visualizations(dataframe):
+    """Generate all visualizations based on the analyzed data."""
     
     generate_sentiment_over_time_plot(dataframe)
     generate_character_sentiment_bar_chart(dataframe)
