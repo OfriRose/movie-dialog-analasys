@@ -75,6 +75,9 @@ def generate_character_sentiment_bar_chart(dataframe):
     plt.savefig("character_sentiment_comparison.png")
     plt.show()
 
+    for character_name in selected_characters.index:
+        generate_word_cloud(dataframe, character_name)
+
 def generate_word_cloud(dataframe, character_name):
     character_df = dataframe[dataframe['character'] == character_name.upper()]
     
