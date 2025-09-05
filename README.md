@@ -28,9 +28,11 @@ cd your-repo-name
 # 2. Install dependencies
 poetry install
 
-# 3. Add a script file named script.txt to the project root
-# 4. Run analysis
-poetry run python src/main.py
+# 3. Create a directory for the output visualizations
+mkdir output
 
-Outputs (.png files) will appear in the project directory.
+# 4. Run analysis
+poetry run python -m src.movie_dialog_analasys.main script.txt output
+
+Outputs (.png files) will appear in the output directory.
 

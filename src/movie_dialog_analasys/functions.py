@@ -3,6 +3,7 @@ from textblob import TextBlob
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re
+import os
 from wordcloud import WordCloud
 
 def read_file(file_path):
@@ -18,12 +19,15 @@ def clean_and_parse_script(raw_script_text):
     
     skip_characters = {'reprise', 'response', 'voices', 'solo', 'both'}
     for line in lines:
-        match = re.match(r'(\w+):\s*(.*)', line)
+        match = re.match(r'^\s*([A-Z\s]+):\s*(.*)', line)
         if match:
             character, dialogue = match.groups()
+            character = character.strip()
             if character.lower() in skip_characters:
                 continue
             dialogue_data_list.append({'character': character, 'dialogue': dialogue})
+    if not dialogue_data_list:
+        return pd.DataFrame(columns=['character', 'dialogue'])
     return pd.DataFrame(dialogue_data_list)
 
 def get_sentiment(text):
@@ -37,7 +41,7 @@ def analyze_sentiment(dialogue_data):
     dialogue_data['sentiment'] = dialogue_data['dialogue'].apply(get_sentiment)
     return dialogue_data
 
-def generate_sentiment_over_time_plot(dataframe):
+def generate_sentiment_over_time_plot(dataframe, output_dir):
     """Generate a line plot showing sentiment over time."""
     plt.figure(figsize=(14, 7))
 
@@ -50,10 +54,10 @@ def generate_sentiment_over_time_plot(dataframe):
     plt.ylabel("Sentiment Score", fontsize=12)
 
     plt.tight_layout()
-    plt.savefig(f"sentiment_over_time.png")
-    plt.show()
+    plt.savefig(os.path.join(output_dir, "sentiment_over_time.png"))
+    plt.close()
 
-def generate_character_sentiment_bar_chart(dataframe):
+def generate_character_sentiment_bar_chart(dataframe, output_dir):
     """Generate a bar chart comparing sentiment of top and bottom characters."""
     # Calculate the average sentiment score for each character
     character_sentiment = dataframe.groupby('character')['sentiment'].mean()
@@ -73,15 +77,15 @@ def generate_character_sentiment_bar_chart(dataframe):
     
     plt.xticks(rotation=45, ha='right')
     plt.tight_layout()
-    plt.savefig("character_sentiment_comparison.png")
-    plt.show()
+    plt.savefig(os.path.join(output_dir, "character_sentiment_comparison.png"))
+    plt.close()
 
     for character_name in selected_characters.index:
-        generate_word_cloud(dataframe, character_name)
+        generate_word_cloud(dataframe, character_name, output_dir)
 
-def generate_word_cloud(dataframe, character_name):
+def generate_word_cloud(dataframe, character_name, output_dir):
     """Generate a word cloud for the specified character."""
-    character_df = dataframe[dataframe['character'] == character_name.upper()]
+    character_df = dataframe[dataframe['character'].str.lower() == character_name.lower()]
     
     text = " ".join(character_df['dialogue'].tolist()) 
 
@@ -96,12 +100,14 @@ def generate_word_cloud(dataframe, character_name):
     plt.axis("off")
     plt.title(f"Word Cloud for {character_name}")
     
-    plt.savefig(f"{character_name.lower()}_word_cloud.png")
-    plt.show()
+    plt.savefig(os.path.join(output_dir, f"{character_name.lower().replace(' ', '_')}_word_cloud.png"))
+    plt.close()
 
 
-def generate_visualizations(dataframe):
+def generate_visualizations(dataframe, output_dir):
     """Generate all visualizations based on the analyzed data."""
-    
-    generate_sentiment_over_time_plot(dataframe)
-    generate_character_sentiment_bar_chart(dataframe)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    generate_sentiment_over_time_plot(dataframe, output_dir)
+    generate_character_sentiment_bar_chart(dataframe, output_dir)

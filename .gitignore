@@ -1,8 +1,16 @@
 # Python cache files
 __pycache__/
+*.pyc
 
 # Poetry virtual environment folder
 .venv/
+
+# Vim swap files
+*.swp
+*.swo
+
+# Output directory
+output/
 
 # Ignore image and plot files
 *.png
